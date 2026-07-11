@@ -1,8 +1,5 @@
 ops:
-    - description: Search for foo
-      op: url_get
-      args: https://www.google.com/search?q=foo
-    - description: Satisfy validation
+    - description: Emit triage JSON
       op: write_fixture
       args: output/agent-result.json, fixtures/triage/sufficient.json
       content: |

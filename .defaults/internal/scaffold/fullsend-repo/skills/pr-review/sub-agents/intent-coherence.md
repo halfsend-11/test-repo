@@ -1,12 +1,7 @@
 ---
-name: intent-coherence
-description: >-
-  Evaluates architectural coherence & fit, design coherence,
-  intent alignment, PR scope, scope authorization, and tier matching
+name: review-intent-coherence
+description: Evaluates intent alignment, scope authorization, and architectural coherence.
 model: claude-sonnet-4-6@default
-tools: Read, Grep, Glob
-permissionMode: dontAsk
-background: true
 ---
 
 # Intent & Coherence

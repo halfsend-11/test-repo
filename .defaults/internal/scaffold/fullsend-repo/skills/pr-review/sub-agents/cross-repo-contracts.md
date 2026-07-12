@@ -1,11 +1,7 @@
 ---
-name: cross-repo-contracts
-description: >-
-  Evaluates potential API contract breakage affecting other repos.
+name: review-cross-repo-contracts
+description: Evaluates backward compatibility of exported interfaces and API contracts.
 model: claude-sonnet-4-6@default
-tools: Read, Grep, Glob
-permissionMode: dontAsk
-background: true
 ---
 
 # Cross-Repo Contracts

@@ -115,20 +115,6 @@ runs:
           VERSION="${TAG}"
         fi
 
-        # Resolve a full commit SHA to its release tag (if any).
-        if [[ "${VERSION}" =~ ^[0-9a-f]{40}$ ]]; then
-          TAG=$(retry_curl -fsSL \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer ${GH_TOKEN}" \
-            "https://api.github.com/repos/fullsend-ai/fullsend/tags?per_page=100" \
-            | jq -r --arg sha "${VERSION}" '.[] | select(.commit.sha == $sha) | .name' \
-            | grep '^v[0-9]' | head -1) || true
-          if [[ -n "${TAG}" ]]; then
-            echo "SHA ${VERSION} maps to release tag ${TAG}"
-            VERSION="${TAG}"
-          fi
-        fi
-
         if [[ "${VERSION}" == v* ]]; then
           VERSION_URL="${VERSION}"
           VERSION_ASSET="${VERSION#v}"

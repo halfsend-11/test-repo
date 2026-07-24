@@ -50,8 +50,6 @@ on:
         required: true
       FULLSEND_GCP_PROJECT_ID:
         required: true
-      OTEL_EXPORTER_OTLP_TRACES_HEADERS:
-        required: false
 
 concurrency:
   group: fullsend-prioritize-agent-${{ inputs.source_repo }}-${{ fromJSON(inputs.event_payload).issue.number || fromJSON(inputs.event_payload).pull_request.number }}
@@ -69,7 +67,7 @@ jobs:
 
     steps:
       - name: Checkout config repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           # checkout@v7 blocks fork PR checkouts on pull_request_target by default.
           # Safe here: only .fullsend/ config is read, no fork code is executed,
@@ -80,7 +78,7 @@ jobs:
 
       - name: Checkout upstream defaults
         if: hashFiles('.defaults/action.yml', '.fullsend/.defaults/action.yml') == ''
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           repository: ${{ job.workflow_repository }}
           ref: ${{ job.workflow_sha }}
@@ -163,9 +161,6 @@ jobs:
         env:
           GITHUB_ISSUE_URL: ${{ fromJSON(inputs.event_payload).issue.html_url }}
           REPO_FULL_NAME: ${{ inputs.source_repo }}
-          OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: ${{ vars.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT }}
-          OTEL_EXPORTER_OTLP_TRACES_HEADERS: ${{ secrets.OTEL_EXPORTER_OTLP_TRACES_HEADERS }}
-          OTEL_RESOURCE_ATTRIBUTES: ${{ vars.OTEL_RESOURCE_ATTRIBUTES }}
         with:
           agent: prioritize
           version: ${{ inputs.fullsend_version }}

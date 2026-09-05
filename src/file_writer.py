@@ -10,11 +10,17 @@ sequence by adjusting the split point backward to the start of any
 incomplete character at the chunk edge.
 """
 
+from __future__ import annotations
+
 # Default chunk size: 64 KB
 DEFAULT_CHUNK_SIZE = 65536
 
+# Minimum chunk size: must be at least 4 bytes (the maximum length of a
+# single UTF-8 encoded character) to guarantee forward progress.
+MIN_CHUNK_SIZE = 4
 
-def _find_utf8_safe_split(data, offset):
+
+def _find_utf8_safe_split(data: bytes, offset: int) -> int:
     """Return the largest split point <= *offset* that does not bisect a
     UTF-8 character.
 
@@ -62,7 +68,7 @@ def _find_utf8_safe_split(data, offset):
     return offset
 
 
-def save_file(filepath, content, chunk_size=DEFAULT_CHUNK_SIZE):
+def save_file(filepath: str, content: str, chunk_size: int = DEFAULT_CHUNK_SIZE) -> int:
     """Save *content* to *filepath* using UTF-8-aware chunked writes.
 
     The string is first encoded to UTF-8 bytes, then written in chunks
@@ -73,17 +79,23 @@ def save_file(filepath, content, chunk_size=DEFAULT_CHUNK_SIZE):
         filepath: Destination file path.
         content: The text to write (must be ``str``).
         chunk_size: Maximum chunk size in bytes (default 64 KB).
+            Must be >= 4 (the maximum byte length of a UTF-8 character).
 
     Returns:
         Total number of bytes written.
 
     Raises:
         TypeError: If *content* is not a ``str``.
+        ValueError: If *chunk_size* is less than ``MIN_CHUNK_SIZE`` (4).
         OSError: If the file cannot be opened or written to.
     """
     if not isinstance(content, str):
         raise TypeError(
             f"content must be a string, got {type(content).__name__}"
+        )
+    if chunk_size < MIN_CHUNK_SIZE:
+        raise ValueError(
+            f"chunk_size must be >= {MIN_CHUNK_SIZE}, got {chunk_size}"
         )
 
     data = content.encode("utf-8")
@@ -101,7 +113,7 @@ def save_file(filepath, content, chunk_size=DEFAULT_CHUNK_SIZE):
     return total
 
 
-def read_file(filepath):
+def read_file(filepath: str) -> str:
     """Read *filepath* and return its content decoded as UTF-8.
 
     Args:

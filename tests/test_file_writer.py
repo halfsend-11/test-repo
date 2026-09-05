@@ -13,6 +13,7 @@ import pytest
 
 from src.file_writer import (
     DEFAULT_CHUNK_SIZE,
+    MIN_CHUNK_SIZE,
     _find_utf8_safe_split,
     read_file,
     save_file,
@@ -174,3 +175,24 @@ class TestSaveFile:
         content = "\U0001f600" * 100  # 400 bytes of 4-byte emoji
         save_file(tmp_file, content, chunk_size=7)
         assert read_file(tmp_file) == content
+
+    def test_chunk_size_minimum_boundary(self, tmp_file):
+        """chunk_size=4 (MIN_CHUNK_SIZE) should succeed with 4-byte emoji."""
+        content = "\U0001f600" * 50  # 200 bytes of 4-byte emoji
+        save_file(tmp_file, content, chunk_size=MIN_CHUNK_SIZE)
+        assert read_file(tmp_file) == content
+
+    def test_chunk_size_below_minimum_raises(self, tmp_file):
+        """chunk_size=3 is below MIN_CHUNK_SIZE and must raise ValueError."""
+        with pytest.raises(ValueError, match="chunk_size must be >= 4"):
+            save_file(tmp_file, "hello", chunk_size=3)
+
+    def test_chunk_size_zero_raises(self, tmp_file):
+        """chunk_size=0 must raise ValueError."""
+        with pytest.raises(ValueError, match="chunk_size must be >= 4"):
+            save_file(tmp_file, "hello", chunk_size=0)
+
+    def test_chunk_size_negative_raises(self, tmp_file):
+        """Negative chunk_size must raise ValueError."""
+        with pytest.raises(ValueError, match="chunk_size must be >= 4"):
+            save_file(tmp_file, "hello", chunk_size=-1)
